@@ -1,0 +1,34 @@
+
+test_prog.out:     file format elf32-littleriscv
+
+
+Disassembly of section .text:
+
+00010074 <_Z4multv>:
+   10074:	fe010113          	addi	sp,sp,-32
+   10078:	00812e23          	sw	s0,28(sp)
+   1007c:	02010413          	addi	s0,sp,32
+   10080:	3e800793          	li	a5,1000
+   10084:	fef42623          	sw	a5,-20(s0)
+   10088:	00300793          	li	a5,3
+   1008c:	fef42423          	sw	a5,-24(s0)
+   10090:	fec42703          	lw	a4,-20(s0)
+   10094:	fe842783          	lw	a5,-24(s0)
+   10098:	02f707b3          	mul	a5,a4,a5
+   1009c:	00078513          	mv	a0,a5
+   100a0:	01c12403          	lw	s0,28(sp)
+   100a4:	02010113          	addi	sp,sp,32
+   100a8:	00008067          	ret
+
+000100ac <main>:
+   100ac:	ff010113          	addi	sp,sp,-16
+   100b0:	00112623          	sw	ra,12(sp)
+   100b4:	00812423          	sw	s0,8(sp)
+   100b8:	01010413          	addi	s0,sp,16
+   100bc:	fb9ff0ef          	jal	ra,10074 <_Z4multv>
+   100c0:	00000793          	li	a5,0
+   100c4:	00078513          	mv	a0,a5
+   100c8:	00c12083          	lw	ra,12(sp)
+   100cc:	00812403          	lw	s0,8(sp)
+   100d0:	01010113          	addi	sp,sp,16
+   100d4:	00008067          	ret
