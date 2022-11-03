@@ -28,13 +28,6 @@ if (ADD_SANITIZERS)
     set_target_properties (${PROJECT_NAME} PROPERTIES LINK_FLAGS "-fsanitize=address -fsanitize=undefined")
 endif ()
 
-add_executable (writer writer/writer.cpp)
-
-add_custom_target (clean
-    COMMAND rm -r build/*;
-    rm -r ../dump/*
-    )
-
 option(TESTING "Include testing" OFF)
 #tests
 if (TESTING)

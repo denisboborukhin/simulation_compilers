@@ -11,22 +11,28 @@ std::vector<int32_t> get_bin_code (std::string file_name)
 
     // Load ELF data
     if (!reader.load(file_name.c_str ())) {
-        output << "Can't find or process ELF file " << file_name << std::endl;
+        std::cout << "Can't find or process ELF file " << file_name << std::endl;
         return bin_code;
     }
 
     // Print ELF file properties
     output << "ELF file class: ";
-    if (reader.get_class() == ELFIO::ELFCLASS32)
-        output << "ELF32" << std::endl;
+    if (reader.get_class() != ELFIO::ELFCLASS32)
+    {
+        std::cout << "Error ELF file class: ELF64, but expected ELF32" << std::endl;
+        exit (1);
+    }
     else
-        output << "ELF64" << std::endl;
+        output << "ELF32" << std::endl;
 
     output << "ELF file encoding: ";
-    if (reader.get_encoding() == ELFIO::ELFDATA2LSB)
-        output << "Little endian" << std::endl;
+    if (reader.get_encoding() != ELFIO::ELFDATA2LSB)
+    {
+        std::cout << "Error ELF file encoding: \"Big endian\", expected \"Little endian\"" << std::endl;
+        exit (1);
+    }
     else
-        output << "Big endian" << std::endl;
+        output << "Little endian" << std::endl;
 
     // Print ELF file sections info
     ELFIO::Elf_Half sec_num = reader.sections.size();
