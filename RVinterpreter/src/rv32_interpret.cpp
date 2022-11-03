@@ -50,8 +50,8 @@ int main(int argc, char **argv)
             {
                 int32_t elem = *(int32_t*) data;
                 printf ("%x\n", elem);
-                //bin_code.insert (elem);
-
+                
+                bin_code.insert (bin_code.end(), elem);
                 data++;
             }
 
