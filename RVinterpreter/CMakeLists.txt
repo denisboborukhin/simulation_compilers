@@ -9,14 +9,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_COMPILER clang++)
 
-include_directories(include ELFIO)
+include_directories(parser/include ELFIO)
 
-set (SOURCE_LIB src/rv32_interpret.cpp)
+set (SOURCE_LIB parser/src/elf_rv32_parser.cpp)
 
 
 #add_library(${PROJECT_NAME} STATIC ${SOURCE_LIB})
 #add_compile_options (-l elf)
-add_executable (${PROJECT_NAME} ${SOURCE_LIB})
+add_executable (elf_rv32_parser ${SOURCE_LIB})
 #set_target_properties (${PROJECT_NAME} PROPERTIES LINK_FLAGS "-l elf")
 
 #sanitizers
@@ -30,13 +30,11 @@ endif ()
 
 add_executable (writer writer/writer.cpp)
 
-add_custom_target (create_elf
-    COMMENT "create elf file"
-    COMMAND riscv32-unknown-elf-gcc -S test.cpp -o test_prog.s;
-    riscv32-unknown-elf-as test_prog.s -o test_prog.o;
-    riscv32-unknown-elf-ld test_prog.o -o test_prog.out;
-    riscv32-unknown-elf-objdump -S test_prog.out > test_prog.dump;
+add_custom_target (clean
+    COMMAND rm -r build/*;
+    rm -r ../dump/*
     )
+
 option(TESTING "Include testing" OFF)
 #tests
 if (TESTING)
