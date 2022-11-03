@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-#include <elfio/elfio.hpp>
-
 using namespace ELFIO;
 
 int main(int argc, char **argv)
@@ -38,109 +36,29 @@ int main(int argc, char **argv)
     // Print ELF file sections info
     Elf_Half sec_num = reader.sections.size();
     std::cout << "Number of sections: " << sec_num << std::endl;
+
+    std::vector<int32_t> bin_code;
     for (int i = 0; i < sec_num; ++i) {
         section *psec = reader.sections[i];
         std::cout << "  [" << i << "] " << psec->get_name() << "\t" << psec->get_size() << std::endl;
         // Access to section's data
-        // const char* p = reader.sections[i]->get_data()
-    }
+        if (psec->get_name () == ".text")
+        {
+            int32_t* data = (int32_t *) reader.sections[i]->get_data();
+            int size = reader.sections[i]->get_size ();
+            for (int count = 0; count != size; count += sizeof (int32_t))
+            {
+                int32_t elem = *(int32_t*) data;
+                printf ("%x\n", elem);
+                //bin_code.insert (elem);
 
-    // Print ELF file segments info
-    Elf_Half seg_num = reader.segments.size();
-    std::cout << "Number of segments: " << seg_num << std::endl;
-    for (int i = 0; i < seg_num; ++i) {
-        const segment *pseg = reader.segments[i];
-        std::cout << "  [" << i << "] 0x" << std::hex << pseg->get_flags() << "\t0x" << pseg->get_virtual_address()
-                  << "\t0x" << pseg->get_file_size() << "\t0x" << pseg->get_memory_size() << std::endl;
-        // Access to segments's data
-        const char* p = reader.segments[i]->get_data();
-
-        //std::cout << "read!!:: " << p << std::endl;
-    }
-    
-    for (int i = 0; i < sec_num; ++i) {
-        section *psec = reader.sections[i];
-        // Check section type
-        if (psec->get_type() == SHT_SYMTAB) {
-            const symbol_section_accessor symbols(reader, psec);
-            for (unsigned int j = 0; j < symbols.get_symbols_num(); ++j) {
-                std::string name;
-                Elf64_Addr value;
-                Elf_Xword size;
-                unsigned char bind;
-                unsigned char type;
-                Elf_Half section_index;
-                unsigned char other;
-
-                // Read symbol properties
-                symbols.get_symbol(j, name, value, size, bind, type, section_index, other);
-                std::cout << j << " " << name << " " << value << std::endl;
+                data++;
             }
+
+            break;
         }
     }
-    
+
     return 0;
 }
 
-/*
-int fd;
-Elf *e;
-char *name, *p, pc[4 * sizeof(char)];
-Elf_Scn *scn;
-Elf_Data *data;
-GElf_Shdr shdr;
-size_t n, shstrndx, sz;
-
-if (argc != 2)
-    errx(EX_USAGE, "usage: %s file-name", argv[0]);
-
-if (elf_version (EV_CURRENT) == EV_NONE)
-    errx (EX_SOFTWARE , "ELF library initialization failed : %s", elf_errmsg (-1));
-
-if ((fd = open(argv[1], O_RDONLY, 0)) < 0)
-    err(EX_NOINPUT, "open \"%s\" failed", argv[1]);
-
-if ((e = elf_begin(fd, ELF_C_READ, NULL)) == NULL)
-    errx(EX_SOFTWARE, "elf_begin() failed: %s.", elf_errmsg(-1));
-
-if (elf_kind(e) != ELF_K_ELF)
-    errx(EX_DATAERR, "%s is not an ELF object.", argv[1]);
-
-if (elf_getshdrstrndx(e, &shstrndx) != 0)
-    errx(EX_SOFTWARE, "elf_getshdrstrndx() failed: %s.", elf_errmsg(-1));
-
-scn = elf_nextscn(e,scn);
-gelf_getshdr(scn, &shdr);
-name = elf_strptr(e, shstrndx, shdr.sh_name);
-printf("!!Section %-4.4jd %s \n", (uintmax_t)elf_ndxscn(scn), name);
-
-Elf_Cmd cmd = elf_next(e);
-cmd = elf_next(e);
-
-printf ("cmd: %d\n", cmd);
-
-while ((scn = elf_nextscn(e, scn)) != NULL)
-{
-    if (gelf_getshdr(scn, &shdr) != &shdr)
-        errx(EX_SOFTWARE, "getshdr() failed: %s.", elf_errmsg(-1));
-
-    if ((name = elf_strptr(e, shstrndx, shdr.sh_name)) == NULL)
-        errx(EX_SOFTWARE, "elf_strptr() failed: %s.", elf_errmsg(-1));
-
-    printf("Section %-4.4jd %s \n", (uintmax_t)elf_ndxscn(scn), name);
-}
-
-if ((scn = elf_getscn(e, shstrndx)) == NULL)
-    errx(EX_SOFTWARE, "getscn() failed: %s.", elf_errmsg(-1));
-if (gelf_getshdr(scn, &shdr) != &shdr)
-    errx(EX_SOFTWARE, "getshdr(shstrndx) failed: %s.", elf_errmsg(-1));
-
-printf(".shstrab: size=%jd\n", (uintmax_t)shdr.sh_size);
-data = NULL;
-n = 0;
-
-putchar ('\n');
-elf_end (e);
-close (fd);
-exit (EX_OK);
-*/
