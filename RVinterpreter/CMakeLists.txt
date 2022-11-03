@@ -16,16 +16,18 @@ set (SOURCE_LIB parser/src/elf_rv32_parser.cpp)
 
 #add_library(${PROJECT_NAME} STATIC ${SOURCE_LIB})
 #add_compile_options (-l elf)
-add_executable (elf_rv32_parser ${SOURCE_LIB})
+
 #set_target_properties (${PROJECT_NAME} PROPERTIES LINK_FLAGS "-l elf")
 
+add_executable (elf_rv32_parser ${SOURCE_LIB})
+
 #sanitizers
-option(ADD_SANITIZERS "Build with sanitizers" OFF)
+option(ADD_SANITIZERS "Build with sanitizers" ON)
 if (ADD_SANITIZERS)
     message ("Build with sanitizers")
 
     add_compile_options (-fsanitize=address -fsanitize=undefined)
-    set_target_properties (${PROJECT_NAME} PROPERTIES LINK_FLAGS "-fsanitize=address -fsanitize=undefined")
+    set_target_properties (elf_rv32_parser PROPERTIES LINK_FLAGS "-fsanitize=address -fsanitize=undefined")
 endif ()
 
 option(TESTING "Include testing" OFF)
