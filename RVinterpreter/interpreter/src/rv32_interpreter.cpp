@@ -1,48 +1,21 @@
 #include "rv32_interpreter.hpp"
 
-int cpu::get_pc ()
-{
-    return pc;
-}
-
-int cpu:: next_pc ()
-{
-    return ++pc;
-}
-
-int cpu::set_pc (int val)
-{
-    pc = val;
-
-    return pc;
-}
-
-int32_t cpu::get_reg (int num_reg)
-{
-    if (num_reg < NUM_REGS)
-        return regfile[num_reg];
-    else 
-        exit (0);
-}
-
-int32_t cpu::set_reg (int num_reg, int32_t val_reg)
-{
-    if (num_reg < NUM_REGS)
-        return regfile[num_reg] = val_reg;
-    else 
-        exit (0);
-}
-
 void interpret_rv32_bin_code (std::string elf_file_name)
 {
     cpu cpu;
-    std::pair<int64_t, std::vector<int32_t>> bin_code = get_bin_code (elf_file_name);       
+    memory memory;
 
+    std::pair<int64_t, std::vector<char>> bin_code = get_bin_code (elf_file_name);       
+    memory.load_code (bin_code.first, bin_code.second);
+
+    int64_t address = bin_code.first;
+    memory.get_word (address);
+    /*
     while (true)
     {
         if (!execute_instruction (cpu, bin_code))
             break;
-    }
+    }*/
 }
 
 int execute_instruction (cpu& cpu, std::pair<int64_t, std::vector<int32_t>>& bin_code)
@@ -57,25 +30,42 @@ int execute_instruction (cpu& cpu, std::pair<int64_t, std::vector<int32_t>>& bin
     {
         case 0b0110011:
         {
-            std::cout << "add!!!\n";
             int rd = get_bits (instruction, 7, 11);
 			int rs1 = get_bits (instruction, 15, 19);
-			int imm = get_bits (instruction, 20, 24);      
-            
+			int rs2 = get_bits (instruction, 20, 24);      
+           
+            auto funct3 = get_bits (instruction, 12, 14);
+            switch (funct3)
+            {
+                case 0b000:
+                    std::cout << "add\n";
+                    cpu.set_reg (rd, cpu.get_reg (rs1) + cpu.get_reg (rs2));
+                    break;
+
+                default:
+                    std::cout << "don't known from add\n";
+            }
+
             break;
         }
 
         case 0b0010011:
         {
-            std::cout << "addi!!!";
             int rd = get_bits (instruction, 7, 11);
 			int rs1 = get_bits (instruction, 15, 19);
 			int imm = get_bits (instruction, 20, 31);
 
-            std::cout << "rd: " << rd << std::endl;
-            std::cout << "imm: " << imm << std::endl;
-
             auto funct3 = get_bits (instruction, 12, 14);
+            switch (funct3)
+            {   
+                case 0b000:                     //addi
+                    std::cout << "addi\n";
+                    cpu.set_reg (rd, cpu.get_reg (rs1) + imm);
+                    break;
+
+                default:
+                    std::cout << "don't known from addi\n";
+            }
 
             break;
         }

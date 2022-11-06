@@ -9,12 +9,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_COMPILER clang++)
 
-include_directories(parser/include interpreter/include ELFIO)
+include_directories(parser/include interpreter/include computer/include ELFIO)
 
-set (SOURCE_LIB parser/src/elf_rv32_parser.cpp)
+set (SOURCE_PARSER parser/src/elf_rv32_parser.cpp)
+set (SOURCE_COMPUTER computer/src/computer.cpp)
 set (SOURCE_INTERPRET interpreter/src/rv32_interpreter.cpp)
 
-add_library (elf_rv32_parser STATIC ${SOURCE_LIB})
+add_library (elf_rv32_parser STATIC ${SOURCE_PARSER})
+add_library (computer STATIC ${SOURCE_COMPUTER})
 
 add_executable (${PROJECT_NAME} ${SOURCE_INTERPRET})
 
@@ -25,10 +27,11 @@ if (ADD_SANITIZERS)
 
     add_compile_options (-fsanitize=address -fsanitize=undefined)
     set_target_properties (elf_rv32_parser PROPERTIES LINK_FLAGS "-fsanitize=address -fsanitize=undefined")
+    set_target_properties (computer PROPERTIES LINK_FLAGS "-fsanitize=address -fsanitize=undefined")
     set_target_properties (${PROJECT_NAME} PROPERTIES LINK_FLAGS "-fsanitize=address -fsanitize=undefined")
 endif ()
 
-target_link_libraries (${PROJECT_NAME} PUBLIC elf_rv32_parser)
+target_link_libraries (${PROJECT_NAME} PUBLIC elf_rv32_parser computer) 
 
 option(TESTING "Include testing" OFF)
 #tests

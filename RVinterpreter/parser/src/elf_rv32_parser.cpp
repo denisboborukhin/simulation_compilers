@@ -1,9 +1,9 @@
 #include "elf_rv32_parser.hpp"
 
-std::pair<int64_t, std::vector<int32_t>> get_bin_code (std::string file_name)
+std::pair<int64_t, std::vector<char>> get_bin_code (std::string file_name)
 {
     int64_t address = 0; 
-    std::vector<int32_t> instructions;
+    std::vector<char> instructions;
 
     // Create an elfio reader
     ELFIO::elfio reader;
@@ -47,13 +47,13 @@ std::pair<int64_t, std::vector<int32_t>> get_bin_code (std::string file_name)
         // Access to section's data
         if (psec->get_name () == ".text")
         {
-            int32_t* data = (int32_t *) psec->get_data();
+            //int32_t* data = (int32_t*) psec->get_data();
             int size = psec->get_size ();
             address = psec->get_address ();
 
             output << "Physical address: " << std::hex << address << std::endl;
-            output << "dddddd: " << std::hex << psec->get_entry_size() << std::endl;
             output << "Binary code from ./text:\n";
+            /*
             for (int count = 0; count != size; count += sizeof (int32_t))
             {
                 int32_t elem = *(int32_t*) data;
@@ -61,7 +61,15 @@ std::pair<int64_t, std::vector<int32_t>> get_bin_code (std::string file_name)
                 
                 instructions.insert (instructions.end(), elem);
                 data++;
-            }
+            }*/
+
+            char* data = (char*) psec->get_data ();
+            for (int count = 0; count != size; count++)
+            {
+                char elem = *data;
+                instructions.insert (instructions.end (), elem);
+                data++;
+            }            
 
             break;
         }
