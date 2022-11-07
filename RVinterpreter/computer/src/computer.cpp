@@ -40,7 +40,6 @@ bool memory::load_code (int64_t address, std::vector<char>& bin_code)
     for (memItr itr = mem.begin (), end = mem.end (); itr != end; ++itr)
     {
         hash_mem[address] = itr;
-        std::cout << address << std::endl;
         address++;
     }
 
@@ -59,15 +58,14 @@ unsigned char memory::get_byte (int64_t address)
 int32_t memory::get_word (int64_t address)
 {
     int32_t word = 0;
-    word = get_byte (address);
-    word <<= 8;
-    word |= get_byte (address + 1); 
+
+    word = get_byte (address + 3);
     word <<= 8;
     word |= get_byte (address + 2); 
     word <<= 8;
-    word |= get_byte (address + 3); 
-
-    std::cout << std::hex << word << std::endl;
+    word |= get_byte (address + 1); 
+    word <<= 8;
+    word |= get_byte (address); 
 
     return word;
 }

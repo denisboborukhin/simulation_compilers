@@ -6,26 +6,24 @@ void interpret_rv32_bin_code (std::string elf_file_name)
     memory memory;
 
     std::pair<int64_t, std::vector<char>> bin_code = get_bin_code (elf_file_name);       
+    
     memory.load_code (bin_code.first, bin_code.second);
-
-    int64_t address = bin_code.first;
-    memory.get_word (address);
-    /*
-    while (true)
+    cpu.set_pc (bin_code.first);
+    
+    for (int i = 0; i != 30; ++i)
     {
-        if (!execute_instruction (cpu, bin_code))
+        if (!execute_instruction (cpu, memory))
             break;
-    }*/
+    }
 }
 
-int execute_instruction (cpu& cpu, std::pair<int64_t, std::vector<int32_t>>& bin_code)
+int execute_instruction (cpu& cpu, memory& memory)
 {
-    int pc = cpu.get_pc ();
-    if (pc >= bin_code.second.size ())
-        return 0;
+    int64_t pc = cpu.get_pc ();
+    //if (pc >= memory.mem.size ())
+    //    return 0;
 
-    int32_t instruction = bin_code.second[pc];
-   
+    int32_t instruction = memory.get_word (pc);
     switch (instruction & 0x7F)
     {
         case 0b0110011:
@@ -72,12 +70,12 @@ int execute_instruction (cpu& cpu, std::pair<int64_t, std::vector<int32_t>>& bin
 
         default:
         {
-            std::cout << bin_code.second.size () << std::endl;
+            std::cout << memory.mem.size () << std::endl;
             break;
         }
     }
     
-    cpu.next_pc ();
+    cpu.set_pc (pc + 4);
     return 1;
 }
 
