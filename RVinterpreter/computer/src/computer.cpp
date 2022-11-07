@@ -69,3 +69,23 @@ int32_t memory::get_word (int64_t address)
 
     return word;
 }
+
+char memory::set_byte (int64_t address, char byte)
+{
+    auto hashItr = hash_mem.find (address);
+    if (hashItr == hash_mem.end ())
+    {
+        mem.push_back (byte);
+        hash_mem[address] = --mem.end();
+    }
+    else
+        *(hashItr->second) = byte;
+
+    return byte;
+}
+
+int memory::set_half (int64_t address, int half)
+{
+
+    return half;
+}

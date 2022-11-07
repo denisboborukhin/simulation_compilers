@@ -27,5 +27,8 @@ struct memory final
 
     unsigned char get_byte (int64_t address);
     int32_t get_word (int64_t address);
+
+    char set_byte (int64_t address, char byte);
+    int set_half (int64_t address, int half);
 };
 

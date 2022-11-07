@@ -1,8 +1,0 @@
-ELF file class: ELF32
-ELF file encoding: Little endian
-Number of sections: 8
-  [0] 	0
-  [1] .text	112
-Physical address: 10074
-Binary code from ./text:
-Success parsing

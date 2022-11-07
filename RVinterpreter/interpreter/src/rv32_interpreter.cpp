@@ -68,6 +68,32 @@ int execute_instruction (cpu& cpu, memory& memory)
             break;
         }
 
+        case 0b0100011:
+        {
+            int rs1 = get_bits (instruction, 15, 19);
+            int rs2 = get_bits (instruction, 20, 24);
+            int imm = (get_bits (instruction, 25, 31) << 5) + get_bits (instruction, 7, 11);
+
+            auto funct3 = get_bits (instruction, 12, 14);
+            switch (funct3)
+            {
+                case 0b000:
+                    std::cout << "sb\n";
+                    memory.set_byte (rs1 + imm, rs2);
+                    break;
+
+                case 0b001:
+                    std::cout << "sh\n";
+                    break;
+
+                case 0b010:
+                    std::cout << "sw\n";
+                    break;
+            }
+
+            break;
+        }
+
         default:
         {
             std::cout << memory.mem.size () << std::endl;
