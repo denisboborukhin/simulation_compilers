@@ -20,10 +20,11 @@ void interpret_rv32_bin_code (std::string elf_file_name)
 int execute_instruction (cpu& cpu, memory& memory)
 {
     int64_t pc = cpu.get_pc ();
-    //if (pc >= memory.mem.size ())
-    //    return 0;
 
     int32_t instruction = memory.get_word (pc);
+    if (!instruction)
+        return 0;
+
     switch (instruction & 0x7F)
     {
         case 0b0110011:
@@ -84,11 +85,78 @@ int execute_instruction (cpu& cpu, memory& memory)
 
                 case 0b001:
                     std::cout << "sh\n";
+                    memory.set_half (rs1 + imm, rs2);
                     break;
 
                 case 0b010:
                     std::cout << "sw\n";
+                    memory.set_word (rs1 + imm, rs2);
                     break;
+            }
+
+            break;
+        }
+
+        case 0b0000011:
+        {
+            int rd = get_bits (instruction, 7, 11);
+            int rs1 = get_bits (instruction, 15, 19);
+            int imm = get_bits (instruction, 20, 31);
+
+            auto funct3 = get_bits (instruction, 12, 14);
+            switch (funct3)
+            {
+                case 0b000:
+                    std::cout << "lb\n";
+                    cpu.set_reg (rd, memory.get_byte (rs1 + imm));
+                    break;
+
+                case 0b001:
+                    std::cout << "lh\n";
+                    cpu.set_reg (rd, memory.get_half (rs1 + imm));
+                    break;
+
+                case 0b010:
+                    std::cout << "lw\n";
+                    cpu.set_reg (rd, memory.get_word (rs1 + imm));
+                    break;
+            }
+
+            break;
+        }
+
+        case 0b1101111:
+        {
+            std::cout << "jal\n";
+
+            int rd = get_bits (instruction, 7, 11);
+            int imm = (get_bits(instruction, 31, 31) << 19) + (get_bits(instruction, 12, 19) << 11) +
+                (get_bits(instruction, 20, 20) << 10) + get_bits(instruction, 21, 30);
+
+            cpu.set_reg (rd, pc + 4);
+            cpu.set_pc (imm + pc);
+
+            break;
+        }
+        
+        case 0b1100111:
+        {
+            std::cout << "jalr\n";
+
+            int rd = get_bits (instruction, 7, 11);
+            int rs1 = get_bits (instruction, 15, 19);
+            int imm = get_bits(instruction, 20, 31); 
+
+            auto funct3 = get_bits (instruction, 12, 14);
+            if (funct3 == 0b000)
+            {
+                cpu.set_reg (rd, pc + 4);
+                cpu.set_pc (imm + rs1);
+            }
+            else
+            {
+                std::cout << "Unknown funct3 for jalr\n";
+                exit (0);
             }
 
             break;

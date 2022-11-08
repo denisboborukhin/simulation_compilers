@@ -55,10 +55,25 @@ unsigned char memory::get_byte (int64_t address)
         return 0;
 }
 
+int16_t memory::get_half (int64_t address)
+{
+    int16_t half = 0;
+    half = get_byte (address + 1);
+    half <<= 8;
+    half |= get_byte (address);
+
+    return half;
+}
+
 int32_t memory::get_word (int64_t address)
 {
     int32_t word = 0;
 
+    word = get_half (address + 2);
+    word <<= 16;
+    word |= get_half (address);
+   
+    /*
     word = get_byte (address + 3);
     word <<= 8;
     word |= get_byte (address + 2); 
@@ -66,7 +81,7 @@ int32_t memory::get_word (int64_t address)
     word |= get_byte (address + 1); 
     word <<= 8;
     word |= get_byte (address); 
-
+*/
     return word;
 }
 
@@ -84,8 +99,18 @@ char memory::set_byte (int64_t address, char byte)
     return byte;
 }
 
-int memory::set_half (int64_t address, int half)
-{
+int16_t memory::set_half (int64_t address, int16_t half)
+{   
+    set_byte (address, half & 0xFF);
+    set_byte (address + 1, (half >> 8) & 0xFF);
 
     return half;
+}
+
+int32_t memory::set_word (int64_t address, int32_t word)
+{
+    set_half (address, word & 0xFFFF);
+    set_half (address + 2, (word >> 16) & 0xFFFF);
+
+    return word;
 }
