@@ -10,7 +10,8 @@ void interpret_rv32_bin_code (std::string elf_file_name)
     memory.load_code (bin_code.first, bin_code.second);
     cpu.set_pc (bin_code.first);
 
-    for (int i = 0; i != 30; ++i)
+    //memory.dump ();
+    for (;;)
     {
         if (!execute_instruction (cpu, memory))
             break;
@@ -22,7 +23,7 @@ int execute_instruction (cpu& cpu, memory& memory)
 {
     int64_t pc = cpu.get_pc ();
 
-    int32_t instruction = memory.get_word (pc);
+    uint32_t instruction = memory.get_word (pc);
     if (!instruction)
         return 0;
 
@@ -75,7 +76,8 @@ int execute_instruction (cpu& cpu, memory& memory)
             int rs1 = get_bits (instruction, 15, 19);
             int rs2 = get_bits (instruction, 20, 24);
             int imm = (get_bits (instruction, 25, 31) << 5) + get_bits (instruction, 7, 11);
-          
+         
+            std::cout << "store to: " << std::hex << cpu.get_reg (rs1) + imm << std::endl;
             auto funct3 = get_bits (instruction, 12, 14);
             switch (funct3)
             {
@@ -90,6 +92,7 @@ int execute_instruction (cpu& cpu, memory& memory)
                     break;
 
                 case 0b010: 
+                    std::cout << "sw\n";
                     memory.set_word (cpu.get_reg (rs1) + imm, cpu.get_reg (rs2));
                     break;
             }
@@ -103,22 +106,23 @@ int execute_instruction (cpu& cpu, memory& memory)
             int rs1 = get_bits (instruction, 15, 19);
             int imm = get_bits (instruction, 20, 31);
 
+            std::cout << "load from: " << std::hex << cpu.get_reg (rs1) + imm << std::endl;
             auto funct3 = get_bits (instruction, 12, 14);
             switch (funct3)
             {
                 case 0b000:
                     std::cout << "lb\n";
-                    cpu.set_reg (rd, memory.get_byte (rs1 + imm));
+                    cpu.set_reg (rd, memory.get_byte (cpu.get_reg (rs1) + imm));
                     break;
 
                 case 0b001:
                     std::cout << "lh\n";
-                    cpu.set_reg (rd, memory.get_half (rs1 + imm));
+                    cpu.set_reg (rd, memory.get_half (cpu.get_reg (rs1) + imm));
                     break;
 
                 case 0b010:
                     std::cout << "lw\n";
-                    cpu.set_reg (rd, memory.get_word (rs1 + imm));
+                    cpu.set_reg (rd, memory.get_word (cpu.get_reg (rs1) + imm));
                     break;
             }
 
@@ -168,7 +172,7 @@ int execute_instruction (cpu& cpu, memory& memory)
             break;
         }
     }
-    
+   
     cpu.set_pc (pc + 4);
     return 1;
 }
@@ -185,7 +189,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    interpret_rv32_bin_code (argv[1]);        
+    interpret_rv32_bin_code (argv[1]);               
 
     return 0;
 }

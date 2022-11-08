@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <unordered_map>
+#include <iomanip>
 
 class cpu final
 {
@@ -9,11 +10,11 @@ class cpu final
     int pc = 0;
 
 public:
-    int get_pc ();
+    int get_pc () const;
     int next_pc ();
     int set_pc (int val);
-    int32_t get_reg (int num_reg);
-    int32_t set_reg (int num_reg, int32_t val_reg);
+    int32_t get_reg (const int num_reg) const;
+    int32_t set_reg (const int num_reg, const int32_t val_reg);
 };
 
 struct memory final
@@ -23,11 +24,11 @@ struct memory final
     using memItr = typename std::vector<char>::iterator;
     std::unordered_map<int64_t, memItr> hash_mem;
 
-    bool load_code (int64_t address, std::vector<char>& bin_code);
+    bool load_code (const int64_t start_address, const std::vector<char>& bin_code);
 
-    unsigned char get_byte (int64_t address);
-    int16_t get_half (int64_t address);
-    int32_t get_word (int64_t address);
+    unsigned char get_byte (const int64_t address) const;
+    uint16_t get_half (const int64_t address) const;
+    uint32_t get_word (const int64_t address) const;
 
     char set_byte (int64_t address, char byte);
     int16_t set_half (int64_t address, int16_t half);
