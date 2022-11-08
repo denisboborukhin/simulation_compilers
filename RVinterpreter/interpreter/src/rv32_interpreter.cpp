@@ -9,12 +9,13 @@ void interpret_rv32_bin_code (std::string elf_file_name)
     
     memory.load_code (bin_code.first, bin_code.second);
     cpu.set_pc (bin_code.first);
-    
+
     for (int i = 0; i != 30; ++i)
     {
         if (!execute_instruction (cpu, memory))
             break;
     }
+    memory.dump ();
 }
 
 int execute_instruction (cpu& cpu, memory& memory)
@@ -57,7 +58,7 @@ int execute_instruction (cpu& cpu, memory& memory)
             auto funct3 = get_bits (instruction, 12, 14);
             switch (funct3)
             {   
-                case 0b000:                     //addi
+                case 0b000:                     
                     std::cout << "addi\n";
                     cpu.set_reg (rd, cpu.get_reg (rs1) + imm);
                     break;
@@ -74,23 +75,22 @@ int execute_instruction (cpu& cpu, memory& memory)
             int rs1 = get_bits (instruction, 15, 19);
             int rs2 = get_bits (instruction, 20, 24);
             int imm = (get_bits (instruction, 25, 31) << 5) + get_bits (instruction, 7, 11);
-
+          
             auto funct3 = get_bits (instruction, 12, 14);
             switch (funct3)
             {
                 case 0b000:
                     std::cout << "sb\n";
-                    memory.set_byte (rs1 + imm, rs2);
+                    memory.set_byte (cpu.get_reg (rs1) + imm, cpu.get_reg (rs2));
                     break;
 
                 case 0b001:
                     std::cout << "sh\n";
-                    memory.set_half (rs1 + imm, rs2);
+                    memory.set_half (cpu.get_reg (rs1) + imm, cpu.get_reg (rs2));
                     break;
 
-                case 0b010:
-                    std::cout << "sw\n";
-                    memory.set_word (rs1 + imm, rs2);
+                case 0b010: 
+                    memory.set_word (cpu.get_reg (rs1) + imm, cpu.get_reg (rs2));
                     break;
             }
 

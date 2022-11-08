@@ -72,16 +72,7 @@ int32_t memory::get_word (int64_t address)
     word = get_half (address + 2);
     word <<= 16;
     word |= get_half (address);
-   
-    /*
-    word = get_byte (address + 3);
-    word <<= 8;
-    word |= get_byte (address + 2); 
-    word <<= 8;
-    word |= get_byte (address + 1); 
-    word <<= 8;
-    word |= get_byte (address); 
-*/
+
     return word;
 }
 
@@ -114,3 +105,22 @@ int32_t memory::set_word (int64_t address, int32_t word)
 
     return word;
 }
+
+void memory::dump ()
+{
+    if (hash_mem.size () != mem.size ())
+    {
+        std::cout << "Memory error\n";
+        exit (1);
+    }
+
+    std::cout << "memory:\n";
+    for (auto itr = hash_mem.begin (), end = hash_mem.end (); itr != end; ++itr)
+    {
+        std::cout << '\'' << std::hex << itr->first << "\'\t\"" << std::hex << *(itr->second)  <<
+            "\"" << std::endl;
+    }
+
+    std::cout << "end memory\n";
+}
+

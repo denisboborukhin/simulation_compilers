@@ -53,21 +53,18 @@ std::pair<int64_t, std::vector<char>> get_bin_code (std::string file_name)
 
             output << "Physical address: " << std::hex << address << std::endl;
             output << "Binary code from ./text:\n";
-            /*
-            for (int count = 0; count != size; count += sizeof (int32_t))
-            {
-                int32_t elem = *(int32_t*) data;
-                output << std::setw(8) << std::setfill('0') << std::hex << elem << std::endl;
-                
-                instructions.insert (instructions.end(), elem);
-                data++;
-            }*/
 
             char* data = (char*) psec->get_data ();
             for (int count = 0; count != size; count++)
             {
-                char elem = *data;
-                instructions.insert (instructions.end (), elem);
+                instructions.push_back (*data);
+                if (!(count % 4))
+                {
+                    output << '<' << std::hex << std::setw (8)  << std::setfill ('0') << address + count
+                        << ">:" << '\t' << std::hex << std::setw (8)  << std::setfill ('0') 
+                        << *reinterpret_cast<int*> (data) << std::endl;
+                }
+
                 data++;
             }            
 

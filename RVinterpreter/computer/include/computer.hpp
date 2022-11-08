@@ -5,7 +5,7 @@
 class cpu final
 {
     static constexpr int NUM_REGS = 32;
-    int32_t regfile [NUM_REGS] {};
+    int32_t regfile [NUM_REGS] {0, 0, 8196};
     int pc = 0;
 
 public:
@@ -32,5 +32,7 @@ struct memory final
     char set_byte (int64_t address, char byte);
     int16_t set_half (int64_t address, int16_t half);
     int32_t set_word (int64_t address, int32_t word);
+
+    void dump ();
 };
 
