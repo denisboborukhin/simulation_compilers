@@ -18,14 +18,17 @@ set (SOURCE_INTERPRET interpreter/src/rv32_interpreter.cpp)
 add_library (elf_rv32_parser STATIC ${SOURCE_PARSER})
 add_library (computer STATIC ${SOURCE_COMPUTER})
 
+option(ADD_SANITIZERS "Build with sanitizers" ON)
+if (ADD_SANITIZERS)
+    add_compile_options (-fsanitize=address -fsanitize=undefined) 
+endif ()
+
 add_executable (${PROJECT_NAME} ${SOURCE_INTERPRET})
 
 #sanitizers
-option(ADD_SANITIZERS "Build with sanitizers" ON)
 if (ADD_SANITIZERS)
     message ("Build with sanitizers")
 
-    add_compile_options (-fsanitize=address -fsanitize=undefined)
     set_target_properties (elf_rv32_parser PROPERTIES LINK_FLAGS "-fsanitize=address -fsanitize=undefined")
     set_target_properties (computer PROPERTIES LINK_FLAGS "-fsanitize=address -fsanitize=undefined")
     set_target_properties (${PROJECT_NAME} PROPERTIES LINK_FLAGS "-fsanitize=address -fsanitize=undefined")

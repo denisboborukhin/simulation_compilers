@@ -35,5 +35,7 @@ struct memory final
     int32_t set_word (int64_t address, int32_t word);
 
     void dump ();
+    void dump_mem ();
+    uint32_t dump_word (memItr itr);
 };
 

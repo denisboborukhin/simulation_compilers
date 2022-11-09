@@ -16,7 +16,8 @@ void interpret_rv32_bin_code (std::string elf_file_name)
         if (!execute_instruction (cpu, memory))
             break;
     }
-    memory.dump ();
+
+    //memory.dump ();
 }
 
 int execute_instruction (cpu& cpu, memory& memory)
@@ -77,7 +78,6 @@ int execute_instruction (cpu& cpu, memory& memory)
             int rs2 = get_bits (instruction, 20, 24);
             int imm = (get_bits (instruction, 25, 31) << 5) + get_bits (instruction, 7, 11);
          
-            std::cout << "store to: " << std::hex << cpu.get_reg (rs1) + imm << std::endl;
             auto funct3 = get_bits (instruction, 12, 14);
             switch (funct3)
             {
@@ -92,8 +92,8 @@ int execute_instruction (cpu& cpu, memory& memory)
                     break;
 
                 case 0b010: 
-                    std::cout << "sw\n";
-                    memory.set_word (cpu.get_reg (rs1) + imm, cpu.get_reg (rs2));
+                    std::cout << "sw\n"; 
+                    memory.set_word (cpu.get_reg (rs1) + imm, cpu.get_reg (rs2)); 
                     break;
             }
 
@@ -106,7 +106,6 @@ int execute_instruction (cpu& cpu, memory& memory)
             int rs1 = get_bits (instruction, 15, 19);
             int imm = get_bits (instruction, 20, 31);
 
-            std::cout << "load from: " << std::hex << cpu.get_reg (rs1) + imm << std::endl;
             auto funct3 = get_bits (instruction, 12, 14);
             switch (funct3)
             {
@@ -174,6 +173,7 @@ int execute_instruction (cpu& cpu, memory& memory)
     }
    
     cpu.set_pc (pc + 4);
+ 
     return 1;
 }
 
@@ -185,7 +185,7 @@ int get_bits (int32_t instruction, int young, int old)
 int main(int argc, char **argv)
 {
     if (argc != 2) {
-        std::cout << "Usage: ./elf_rv32_parser <elf_file>" << std::endl;
+        std::cout << "Usage: ./elf_rv32_interpreter <elf_file>" << std::endl;
         return 1;
     }
 

@@ -42,13 +42,14 @@ int32_t cpu::set_reg (const int num_reg, const int32_t val_reg)
 bool memory::load_code (const int64_t start_address, const std::vector<char>& bin_code)
 {
     mem = bin_code;
+    int64_t address = start_address - 4;
 
-    int64_t address = start_address;
-       
+    for (int i = 0; i < 4; i ++)
+        mem.insert (mem.begin (), 0);  
+
     for (memItr itr = mem.begin (), end = mem.end (); itr != end; ++itr)  
     {
-
-        hash_mem[address] = itr;
+        hash_mem.insert ({address, itr});
         address++;
     }
 
@@ -60,8 +61,8 @@ unsigned char memory::get_byte (const int64_t address) const
     auto hashItr = hash_mem.find (address);
     if (hashItr != hash_mem.end ())
         return *(hashItr->second);
-    else
-        return 0;
+    
+    return 0;
 }
 
 uint16_t memory::get_half (const int64_t address) const
@@ -69,7 +70,7 @@ uint16_t memory::get_half (const int64_t address) const
     uint16_t half = 0;
     half = get_byte (address + 1);
     half <<= 8;
-    half |= get_byte (address);
+    half += get_byte (address);
 
     return half;
 }
@@ -80,26 +81,21 @@ uint32_t memory::get_word (const int64_t address) const
 
     word = get_half (address + 2);
     word <<= 16;
-    word |= get_half (address);
+    word += get_half (address);
 
     return word;
 }
 
 char memory::set_byte (int64_t address, char byte)
 {
-    //std::cout << "set: " << std::hex << address << std::endl;
     auto hashItr = hash_mem.find (address);
     if (hashItr == hash_mem.end ())
-    {
-        memItr itr = mem.end ();
-        mem.insert (itr, byte);
-        hash_mem[address] = itr;
+    { 
+        mem.push_back (byte);
+        hash_mem.insert ({address, mem.end () - 1});
     }
     else
-    {
-        std::cout << "I'am imposter!!!!\n";
         *(hashItr->second) = byte;
-    }
 
     return byte;
 }
@@ -118,6 +114,34 @@ int32_t memory::set_word (int64_t address, int32_t word)
     set_half (address + 2, (word >> 16) & 0xFFFF);
 
     return word;
+}
+
+uint32_t memory::dump_word (memItr itr)
+{
+    uint32_t word = 0;
+
+    unsigned char byte = *(itr + 3);
+    word = byte;
+    word <<= 8;
+    byte = *(itr + 2);
+    word += byte;
+    word <<= 8;
+    byte = *(itr + 1);
+    word += byte;
+    word <<= 8;
+    byte = *(itr);
+    word += byte;
+
+    return word;
+}
+
+void memory::dump_mem ()
+{
+    std::cout << "memory dump from vector\n";
+    for (memItr itr = mem.begin (), end = mem.end (); itr < end; itr += 4)
+        std::cout << std::hex << dump_word (itr) << std::endl;
+    
+    std::cout << "memory dump from vector end\n";
 }
 
 void memory::dump ()
