@@ -1,8 +1,8 @@
 #include "elf_rv32_parser.hpp"
 
-std::pair<int64_t, std::vector<char>> get_bin_code (std::string file_name)
+std::pair<uint32_t, std::vector<char>> get_bin_code (std::string file_name)
 {
-    int64_t address = 0; 
+    uint32_t address = 0; 
     std::vector<char> instructions;
 
     // Create an elfio reader

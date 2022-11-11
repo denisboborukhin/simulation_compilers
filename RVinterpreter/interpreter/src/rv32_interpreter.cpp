@@ -5,24 +5,24 @@ void interpret_rv32_bin_code (std::string elf_file_name)
     cpu cpu;
     memory memory;
 
-    std::pair<int64_t, std::vector<char>> bin_code = get_bin_code (elf_file_name);       
+    std::pair<uint32_t, std::vector<char>> bin_code = get_bin_code (elf_file_name);       
     
     memory.load_code (bin_code.first, bin_code.second);
     cpu.set_pc (bin_code.first);
 
-    //memory.dump ();
+    memory.word_dump ();
     for (;;)
     {
         if (!execute_instruction (cpu, memory))
             break;
     }
 
-    //memory.dump ();
+    memory.word_dump ();
 }
 
 int execute_instruction (cpu& cpu, memory& memory)
 {
-    int64_t pc = cpu.get_pc ();
+    uint32_t pc = cpu.get_pc ();
 
     uint32_t instruction = memory.get_word (pc);
     if (!instruction)
