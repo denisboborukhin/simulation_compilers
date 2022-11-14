@@ -10,19 +10,21 @@ void interpret_rv32_bin_code (std::string elf_file_name)
     memory.load_code (bin_code.first, bin_code.second);
     cpu.set_pc (bin_code.first);
 
-    memory.word_dump ();
+    memory.dump_words ();
     for (;;)
     {
         if (!execute_instruction (cpu, memory))
             break;
     }
 
-    memory.word_dump ();
+    cpu.dump_regs ();
+    memory.dump_words ();
 }
 
 int execute_instruction (cpu& cpu, memory& memory)
 {
     uint32_t pc = cpu.get_pc ();
+    std::cout << "pc: " << pc << std::endl;
 
     uint32_t instruction = memory.get_word (pc);
     if (!instruction)
@@ -133,13 +135,13 @@ int execute_instruction (cpu& cpu, memory& memory)
             std::cout << "jal\n";
 
             int rd = get_bits (instruction, 7, 11);
-            int imm = (get_bits(instruction, 31, 31) << 19) + (get_bits(instruction, 12, 19) << 11) +
-                (get_bits(instruction, 20, 20) << 10) + get_bits(instruction, 21, 30);
+            int imm = ((get_bits(instruction, 31, 31) << 19) + (get_bits(instruction, 12, 19) << 11) +
+                (get_bits(instruction, 20, 20) << 10) + get_bits(instruction, 21, 30)) << 1;
 
             cpu.set_reg (rd, pc + 4);
             cpu.set_pc (imm + pc);
-
-            break;
+            
+            return 1;
         }
         
         case 0b1100111:
@@ -150,11 +152,18 @@ int execute_instruction (cpu& cpu, memory& memory)
             int rs1 = get_bits (instruction, 15, 19);
             int imm = get_bits(instruction, 20, 31); 
 
+            #if 0
+            std::cout << "rd: " << rd << "\t ";
+            std::cout << "rs1: " << rs1 << "\t ";
+            std::cout << "imm: " << imm << std::endl;
+            #endif
+
             auto funct3 = get_bits (instruction, 12, 14);
             if (funct3 == 0b000)
             {
                 cpu.set_reg (rd, pc + 4);
-                cpu.set_pc (imm + rs1);
+                cpu.set_pc (imm + cpu.get_reg(rs1));
+                std::cout << "new pc: " << cpu.get_pc () << std::endl;
             }
             else
             {
@@ -162,7 +171,7 @@ int execute_instruction (cpu& cpu, memory& memory)
                 exit (0);
             }
 
-            break;
+            return 1;
         }
 
         default:

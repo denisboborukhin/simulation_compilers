@@ -39,6 +39,15 @@ int32_t cpu::set_reg (const int num_reg, const int32_t val_reg)
     return regfile[num_reg] = val_reg;
 }
 
+void cpu::dump_regs () const
+{
+    std::cout << "regs dump:\n";
+    for (int i = 0; i != NUM_REGS; ++i)
+        std::cout << "[" << std::setw(2) << std::setfill('0') << std::dec << i << "] "
+            << regfile[i] << std::endl; 
+    std::cout << "end of regs dump\n";
+}
+
 bool memory::load_code (const uint32_t start_address, const std::vector<char>& bin_code)
 {
    int32_t address = start_address;
@@ -109,7 +118,7 @@ int32_t memory::set_word (uint32_t address, int32_t word)
     return word;
 }
 
-void memory::word_dump ()
+void memory::dump_words ()
 {
     std::cout << "memory:\n";
     int count = 0;

@@ -16,6 +16,8 @@ public:
     
     int32_t get_reg (const int num_reg) const;
     int32_t set_reg (const int num_reg, const int32_t val_reg);
+
+    void dump_regs () const; 
 };
 
 struct memory final
@@ -32,5 +34,5 @@ struct memory final
     int16_t set_half (uint32_t address, int16_t half);
     int32_t set_word (uint32_t address, int32_t word);
 
-    void word_dump ();
+    void dump_words ();
 };
