@@ -12,5 +12,6 @@ int sum ()
 
     int c = a + b;
 
+    printf (c);
     return c;
 }

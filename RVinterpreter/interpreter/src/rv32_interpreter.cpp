@@ -24,7 +24,6 @@ void interpret_rv32_bin_code (std::string elf_file_name)
 int execute_instruction (cpu& cpu, memory& memory)
 {
     uint32_t pc = cpu.get_pc ();
-    std::cout << "pc: " << pc << std::endl;
 
     uint32_t instruction = memory.get_word (pc);
     if (!instruction)
@@ -163,7 +162,6 @@ int execute_instruction (cpu& cpu, memory& memory)
             {
                 cpu.set_reg (rd, pc + 4);
                 cpu.set_pc (imm + cpu.get_reg(rs1));
-                std::cout << "new pc: " << cpu.get_pc () << std::endl;
             }
             else
             {

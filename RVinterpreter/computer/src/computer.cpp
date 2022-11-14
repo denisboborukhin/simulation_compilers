@@ -44,7 +44,7 @@ void cpu::dump_regs () const
     std::cout << "regs dump:\n";
     for (int i = 0; i != NUM_REGS; ++i)
         std::cout << "[" << std::setw(2) << std::setfill('0') << std::dec << i << "] "
-            << regfile[i] << std::endl; 
+            << std::hex << regfile[i] << std::endl; 
     std::cout << "end of regs dump\n";
 }
 
