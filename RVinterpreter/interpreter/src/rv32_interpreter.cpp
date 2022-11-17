@@ -10,6 +10,7 @@ void interpret_rv32_bin_code (std::string elf_file_name)
     memory.load_code (bin_code.first, bin_code.second);
     cpu.set_pc (bin_code.first);
 
+    cpu.dump_regs ();
     memory.dump_words ();
     for (;;)
     {
@@ -58,6 +59,12 @@ int execute_instruction (cpu& cpu, memory& memory)
 			int rs1 = get_bits (instruction, 15, 19);
 			int imm = get_bits (instruction, 20, 31);
 
+            #if 0
+            std::cout << "rd: " << rd << "\t ";
+            std::cout << "rs1: " << rs1 << "\t ";
+            std::cout << "imm: " << imm << std::endl;
+            #endif
+
             auto funct3 = get_bits (instruction, 12, 14);
             switch (funct3)
             {   
@@ -78,7 +85,13 @@ int execute_instruction (cpu& cpu, memory& memory)
             int rs1 = get_bits (instruction, 15, 19);
             int rs2 = get_bits (instruction, 20, 24);
             int imm = (get_bits (instruction, 25, 31) << 5) + get_bits (instruction, 7, 11);
-         
+        
+            #if 0
+            std::cout << "rs1: " << rs1 << "\t ";
+            std::cout << "rs2: " << rs2 << "\t ";
+            std::cout << "imm: " << imm << std::endl;
+            #endif
+
             auto funct3 = get_bits (instruction, 12, 14);
             switch (funct3)
             {

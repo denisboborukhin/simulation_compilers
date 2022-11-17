@@ -6,7 +6,7 @@
 class cpu final
 {
     static constexpr int NUM_REGS = 32;
-    int32_t regfile [NUM_REGS] {0, 0, 8196};
+    int32_t regfile [NUM_REGS] {0, 0, 8192};
     uint32_t pc = 0;
 
 public:

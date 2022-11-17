@@ -35,7 +35,10 @@ int32_t cpu::set_reg (const int num_reg, const int32_t val_reg)
         std::cout << "invalid number of register\n";
         exit (0);
     }
-    
+   
+    if (num_reg == 0)
+        return 0;
+
     return regfile[num_reg] = val_reg;
 }
 
@@ -84,6 +87,7 @@ uint32_t memory::get_word (const uint32_t address) const
 {
     uint32_t word = 0;
 
+    //std::cout << "get address: " << std::hex << address << std::endl;
     word = get_half (address + 2);
     word <<= 16;
     word += get_half (address);
@@ -112,9 +116,11 @@ int16_t memory::set_half (uint32_t address, int16_t half)
 
 int32_t memory::set_word (uint32_t address, int32_t word)
 {
+    //std::cout << "set address: " << std::hex << address << " word: " << word << std::endl;
     set_half (address, word & 0xFFFF);
     set_half (address + 2, (word >> 16) & 0xFFFF);
 
+    //std::cout << std::hex << get_word (address) << std::endl;
     return word;
 }
 
