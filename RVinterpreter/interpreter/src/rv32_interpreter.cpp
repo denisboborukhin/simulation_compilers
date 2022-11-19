@@ -1,5 +1,8 @@
 #include "rv32_interpreter.hpp"
 
+static bool check_and_execute_shifts (cpu& cpu, int rd, int rs1, int imm, int funct3);
+static int get_bits (int32_t instruction, int left, int right);
+
 void interpret_rv32_bin_code (std::string elf_file_name)
 {
     cpu cpu;
@@ -64,7 +67,7 @@ int execute_instruction (cpu& cpu, memory& memory)
             std::cout << "rs1: " << rs1 << "\t ";
             std::cout << "imm: " << imm << std::endl;
             #endif
-
+            
             auto funct3 = get_bits (instruction, 12, 14);
             switch (funct3)
             {   
@@ -73,8 +76,30 @@ int execute_instruction (cpu& cpu, memory& memory)
                     cpu.set_reg (rd, cpu.get_reg (rs1) + imm);
                     break;
 
+               case 0b010:
+                    std::cout << "slti\n";
+                    if (cpu.get_reg (rs1) < imm)
+                        cpu.set_reg (rd, 1);
+                    break;
+                
+                case 0b100:
+                    std::cout << "xori\n";
+                    cpu.set_reg (rd, cpu.get_reg (rs1) ^ imm);
+                    break;
+
+                case 0b110:
+                    std::cout << "ori\n";
+                    cpu.set_reg (rd, cpu.get_reg (rs1) | imm);
+                    break;
+
+                case 0b111:
+                    std::cout << "andri\n";
+                    cpu.set_reg (rd, cpu.get_reg (rs1) & imm);
+                    break;
+
                 default:
-                    std::cout << "don't known from addi\n";
+                    check_and_execute_shifts (cpu, rd, rs1, imm, funct3);
+                    break;
             }
 
             break;
@@ -197,7 +222,43 @@ int execute_instruction (cpu& cpu, memory& memory)
     return 1;
 }
 
-int get_bits (int32_t instruction, int young, int old)
+static bool check_and_execute_shifts (cpu& cpu, int rd, int rs1, int imm, int funct3)
+{
+    auto funct7 = get_bits (imm, 5, 11);
+    imm = static_cast<unsigned> (get_bits (imm, 0, 4));
+                    
+    if (funct7 == 0b0000000)
+    {
+        if (funct3 == 0b001)
+        {
+            std::cout << "slli\n";
+            cpu.set_reg (rd, cpu.get_reg (rs1) << imm);
+
+            return true;
+        }
+        else if (funct3 == 0b101)
+        {
+            cpu.set_reg (rd, cpu.get_reg (rs1) >> imm);
+            std::cout << "slri\n";
+
+            return true;
+        }
+    }
+    else if (funct7 == 0b0100000)
+    {
+        if (funct3 == 0b101)
+        {
+            std::cout << "srai\n";
+
+            return true;
+        }
+    }
+    
+    std::cout << "Incorrect funct3 for 0b0010011 operation\n";
+    return false;
+}
+
+static int get_bits (int32_t instruction, int young, int old)
 {
     return static_cast<int>(((instruction << (31 - old)) >> (31 - old)) >> young);
 }
