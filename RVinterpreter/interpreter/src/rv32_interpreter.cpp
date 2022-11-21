@@ -12,18 +12,22 @@ void interpret_rv32_bin_code (std::string elf_file_name)
     cpu cpu;
     memory memory;
 
-    std::pair<uint32_t, std::vector<char>> bin_code = get_bin_code (elf_file_name);       
+    std::pair<std::pair<uint32_t, uint32_t>, std::vector<char>> bin_code = 
+        get_bin_code (elf_file_name);       
     
-    memory.load_code (bin_code.first, bin_code.second);
-    cpu.set_pc (bin_code.first);
+    memory.load_code (bin_code.first.first, bin_code.second);
+    cpu.set_pc (bin_code.first.second);
 
     cpu.dump_regs ();
     memory.dump_words ();
+
+    std::cout << "asm code: " << std::endl;
     for (;;)
     {
         if (!execute_instruction (cpu, memory))
             break;
     }
+    std::cout << "end of asm code" << std::endl;
 
     cpu.dump_regs ();
     memory.dump_words ();
@@ -181,7 +185,7 @@ int execute_instruction (cpu& cpu, memory& memory)
 
             cpu.set_reg (rd, pc + 4);
             cpu.set_pc (imm + pc);
-            
+
             return 1;
         }
         
@@ -216,7 +220,7 @@ int execute_instruction (cpu& cpu, memory& memory)
 
         default:
         {
-            std::cout << memory.mem.size () << std::endl;
+            std::cout << "Unknown code of operation. PC: " << std::hex << pc << std::endl;
             break;
         }
     }

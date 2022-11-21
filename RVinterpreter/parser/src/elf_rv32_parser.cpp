@@ -1,8 +1,9 @@
 #include "elf_rv32_parser.hpp"
 
-std::pair<uint32_t, std::vector<char>> get_bin_code (std::string file_name)
+std::pair<std::pair<uint32_t, uint32_t>, std::vector<char>> get_bin_code (std::string file_name)
 {
     uint32_t address = 0; 
+    uint32_t entry_point = 0;
     std::vector<char> instructions;
 
     // Create an elfio reader
@@ -13,7 +14,7 @@ std::pair<uint32_t, std::vector<char>> get_bin_code (std::string file_name)
     // Load ELF data
     if (!reader.load(file_name.c_str ())) {
         std::cout << "Can't find or process ELF file " << file_name << std::endl;
-        return {address, instructions};
+        return {{address, entry_point}, instructions};
     }
 
     // Print ELF file properties
@@ -35,6 +36,37 @@ std::pair<uint32_t, std::vector<char>> get_bin_code (std::string file_name)
     else
         output << "Little endian" << std::endl;
 
+    entry_point = reader.get_entry ();
+
+    output << "Entry point: " << std::hex << std::setw(8) << std::setfill ('0') 
+        << entry_point << std::endl;
+
+    //read data from segment
+    ELFIO::segment *pseg = reader.segments[1];
+    ELFIO::Elf_Half seg_num = reader.segments.size();
+    char* data  = (char*) pseg->get_data();
+    int size = pseg->get_file_size ();
+
+    address = pseg->get_virtual_address ();
+
+    output << "Physical address: " << std::hex << std::setw (8)  << std::setfill ('0')
+        << address << std::endl;
+    output << "Binary code from ./text:\n";
+ 
+    for (int count = 0; count != size; count++)
+    {
+        instructions.push_back (*data);
+        if (!(count % 4))
+        {
+            output << '<' << std::hex << std::setw (8)  << std::setfill ('0') << address + count
+                << ">:" << '\t' << std::hex << std::setw (8)  << std::setfill ('0') 
+                << *reinterpret_cast<uint32_t*> (data) << std::endl;
+        }
+
+        data++;
+    }            
+
+#if 0
     // Print ELF file sections info
     ELFIO::Elf_Half sec_num = reader.sections.size();
     output << "Number of sections: " << sec_num << std::endl;
@@ -71,10 +103,11 @@ std::pair<uint32_t, std::vector<char>> get_bin_code (std::string file_name)
             break;
         }
     }
+#endif
 
     output << "Success parsing\n";
     output.close ();
 
-    return {address, instructions};
+    return {{address, entry_point}, instructions};
 }
 
