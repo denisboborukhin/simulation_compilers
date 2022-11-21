@@ -3,6 +3,9 @@
 #include <unordered_map>
 #include <iomanip>
 
+namespace computer
+{
+
 class cpu final
 {
     static constexpr int NUM_REGS = 32;
@@ -13,7 +16,7 @@ class cpu final
 public:
     uint32_t get_pc () const;
     uint32_t next_pc ();
-    uint32_t set_pc (int val);
+    uint32_t set_pc (const int val);
     
     int32_t get_reg (const int num_reg) const;
     int32_t set_reg (const int num_reg, const int32_t val_reg);
@@ -31,9 +34,11 @@ struct memory final
     uint16_t get_half (const uint32_t address) const;
     uint32_t get_word (const uint32_t address) const;
 
-    char set_byte (uint32_t address, char byte);
-    int16_t set_half (uint32_t address, int16_t half);
-    int32_t set_word (uint32_t address, int32_t word);
+    char set_byte (const uint32_t address, const char byte);
+    int16_t set_half (const uint32_t address, const int16_t half);
+    int32_t set_word (const uint32_t address, const int32_t word);
 
     void dump_words ();
 };
+
+}

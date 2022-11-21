@@ -1,5 +1,8 @@
 #include "computer.hpp"
 
+namespace computer 
+{
+
 uint32_t cpu::get_pc () const
 {
     return pc;
@@ -10,7 +13,7 @@ uint32_t cpu:: next_pc ()
     return ++pc;
 }
 
-uint32_t cpu::set_pc (int val)
+uint32_t cpu::set_pc (const int val)
 {
     pc = val;
 
@@ -95,7 +98,7 @@ uint32_t memory::get_word (const uint32_t address) const
     return word;
 }
 
-char memory::set_byte (uint32_t address, char byte)
+char memory::set_byte (const uint32_t address, const char byte)
 {
     auto hashItr = mem.find (address);
     if (hashItr == mem.end ())
@@ -106,7 +109,7 @@ char memory::set_byte (uint32_t address, char byte)
     return byte;
 }
 
-int16_t memory::set_half (uint32_t address, int16_t half)
+int16_t memory::set_half (const uint32_t address, const int16_t half)
 {   
     set_byte (address, half & 0xFF);
     set_byte (address + 1, (half >> 8) & 0xFF);
@@ -114,7 +117,7 @@ int16_t memory::set_half (uint32_t address, int16_t half)
     return half;
 }
 
-int32_t memory::set_word (uint32_t address, int32_t word)
+int32_t memory::set_word (const uint32_t address, const int32_t word)
 {
     //std::cout << "set address: " << std::hex << address << " word: " << word << std::endl;
     set_half (address, word & 0xFFFF);
@@ -146,3 +149,4 @@ void memory::dump_words ()
     std::cout << "end memory\n";
 }
 
+}

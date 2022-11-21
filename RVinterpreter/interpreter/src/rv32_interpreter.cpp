@@ -1,7 +1,11 @@
 #include "rv32_interpreter.hpp"
 
-static bool check_and_execute_shifts (cpu& cpu, int rd, int rs1, int imm, int funct3);
-static int get_bits (int32_t instruction, int left, int right);
+using computer::cpu;
+using computer::memory;
+
+static bool check_and_execute_shifts (cpu& cpu, const int rd, const int rs1, 
+        const int imm, const int funct3);
+static int get_bits (const int32_t instruction, const int left, const int right);
 
 void interpret_rv32_bin_code (std::string elf_file_name)
 {
@@ -222,24 +226,25 @@ int execute_instruction (cpu& cpu, memory& memory)
     return 1;
 }
 
-static bool check_and_execute_shifts (cpu& cpu, int rd, int rs1, int imm, int funct3)
+static bool check_and_execute_shifts (cpu& cpu, const int rd, const int rs1, 
+        const int imm, const int funct3)
 {
     auto funct7 = get_bits (imm, 5, 11);
-    imm = static_cast<unsigned> (get_bits (imm, 0, 4));
+    int new_imm = static_cast<unsigned> (get_bits (imm, 0, 4));
                     
     if (funct7 == 0b0000000)
     {
         if (funct3 == 0b001)
         {
             std::cout << "slli\n";
-            cpu.set_reg (rd, cpu.get_reg (rs1) << imm);
+            cpu.set_reg (rd, cpu.get_reg (rs1) << new_imm);
 
             return true;
         }
         else if (funct3 == 0b101)
         {
-            cpu.set_reg (rd, cpu.get_reg (rs1) >> imm);
             std::cout << "slri\n";
+            cpu.set_reg (rd, cpu.get_reg (rs1) >> new_imm);
 
             return true;
         }
@@ -258,7 +263,7 @@ static bool check_and_execute_shifts (cpu& cpu, int rd, int rs1, int imm, int fu
     return false;
 }
 
-static int get_bits (int32_t instruction, int young, int old)
+static int get_bits (const int32_t instruction, const int young, const int old)
 {
     return static_cast<int>(((instruction << (31 - old)) >> (31 - old)) >> young);
 }
