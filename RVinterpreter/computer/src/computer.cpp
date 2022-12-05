@@ -8,11 +8,6 @@ uint32_t cpu::get_pc () const
     return pc;
 }
 
-uint32_t cpu:: next_pc ()
-{
-    return ++pc;
-}
-
 uint32_t cpu::set_pc (const int val)
 {
     pc = val;
