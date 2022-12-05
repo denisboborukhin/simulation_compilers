@@ -66,45 +66,6 @@ std::pair<std::pair<uint32_t, uint32_t>, std::vector<char>> get_bin_code (std::s
         data++;
     }            
 
-#if 0
-    // Print ELF file sections info
-    ELFIO::Elf_Half sec_num = reader.sections.size();
-    output << "Number of sections: " << sec_num << std::endl;
-
-    for (int i = 0; i < sec_num; ++i) 
-    {
-        ELFIO::section *psec = reader.sections[i];
-        
-        output << "  [" << i << "] " << psec->get_name() << "\t" << psec->get_size() << std::endl;
-        // Access to section's data
-        if (psec->get_name () == ".text")
-        {
-            //int32_t* data = (int32_t*) psec->get_data();
-            int size = psec->get_size ();
-            address = psec->get_address ();
-
-            output << "Physical address: " << std::hex << address << std::endl;
-            output << "Binary code from ./text:\n";
-
-            char* data = (char*) psec->get_data ();
-            for (int count = 0; count != size; count++)
-            {
-                instructions.push_back (*data);
-                if (!(count % 4))
-                {
-                    output << '<' << std::hex << std::setw (8)  << std::setfill ('0') << address + count
-                        << ">:" << '\t' << std::hex << std::setw (8)  << std::setfill ('0') 
-                        << *reinterpret_cast<uint32_t*> (data) << std::endl;
-                }
-
-                data++;
-            }            
-
-            break;
-        }
-    }
-#endif
-
     output << "Success parsing\n";
     output.close ();
 
