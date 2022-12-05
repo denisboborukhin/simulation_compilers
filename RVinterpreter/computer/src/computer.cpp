@@ -22,7 +22,7 @@ uint32_t cpu::set_pc (const int val)
 
 int32_t cpu::get_reg (const int num_reg) const
 {
-    if (num_reg >= NUM_REGS)
+    if (num_reg >= NUM_REGS || num_reg < 0)
     {
         std::cout << "invalid number of register\n";
         exit (0);
@@ -33,7 +33,7 @@ int32_t cpu::get_reg (const int num_reg) const
 
 int32_t cpu::set_reg (const int num_reg, const int32_t val_reg)
 {
-    if (num_reg >= NUM_REGS)
+    if (num_reg >= NUM_REGS || num_reg < 0)
     {
         std::cout << "invalid number of register\n";
         exit (0);
@@ -56,7 +56,7 @@ void cpu::dump_regs () const
 
 bool memory::load_code (const uint32_t start_address, const std::vector<char>& bin_code)
 {
-   int32_t address = start_address;
+    uint32_t address = start_address;
 
     for (auto itr = bin_code.begin (), end = bin_code.end (); itr != end; ++itr)  
     {

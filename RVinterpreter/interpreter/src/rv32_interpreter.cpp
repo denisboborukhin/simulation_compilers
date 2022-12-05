@@ -7,7 +7,7 @@ static bool check_and_execute_shifts (cpu& cpu, const int rd, const int rs1,
         const int imm, const int funct3);
 static int get_bits (const int32_t instruction, const int left, const int right);
 
-void interpret_rv32_bin_code (std::string elf_file_name)
+void interpret_rv32_bin_code (const std::string& elf_file_name)
 {
     cpu cpu;
     memory memory;
@@ -234,7 +234,7 @@ static bool check_and_execute_shifts (cpu& cpu, const int rd, const int rs1,
         const int imm, const int funct3)
 {
     auto funct7 = get_bits (imm, 5, 11);
-    int new_imm = static_cast<unsigned> (get_bits (imm, 0, 4));
+    unsigned new_imm = static_cast<unsigned> (get_bits (imm, 0, 4));
                     
     if (funct7 == 0b0000000)
     {
@@ -279,7 +279,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    interpret_rv32_bin_code (argv[1]);               
+    interpret_rv32_bin_code ({argv[1]});               
 
     return 0;
 }
