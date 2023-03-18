@@ -1,6 +1,6 @@
 #include "elf_rv32_parser.hpp"
 
-std::pair<std::pair<uint32_t, uint32_t>, std::vector<char>> get_bin_code (std::string file_name)
+std::pair<std::pair<uint32_t, uint32_t>, std::vector<char>> get_bin_code (std::string &file_name)
 {
     uint32_t address = 0; 
     uint32_t entry_point = 0;
